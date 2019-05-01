@@ -1,0 +1,461 @@
+SDCC MSX VDP TMS9918A Functions Library (object type)
+Version: 1.1 (25 April 2019)
+Author: mvac7/303bcn
+Architecture: MSX
+Format: C Object (SDCC .rel)
+Programming language: C
+WEB: 
+mail: mvac7303b@gmail.com
+Doc version: 1.0         
+
+          <<< Sorry! This text is pending correction of the English translation >>>
+
+
+History of versions:
+- v1.0 (14/02/2014) Initial version
+
+Document changes:
+- v1.0 (13/04/2018) Initial version.
+
+
+ 
+>>> Warning!: Document pending correction. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+--------------------------------------------------------------------------------
+Index:
+
+1 Introduction
+2 Acknowledgments.
+3 Requirements
+
+4 Notes about operation
+
+5 Constants
+  5.1 Screen modes 1
+  5.2 Screen modes 2
+  5.3 Palette color codes
+  5.4 VRAM address tables T1 (screen 0)
+  5.5 VRAM address tables G1 (screen 1)
+  5.6 VRAM address tables G2 (screen 2)
+  5.7 VRAM address tables MC (screen 3)
+  
+6 Functions
+  6.1  SCREEN
+  6.2  SetSpritesSize
+  6.3  SetSpritesZoom
+  6.4  COLOR
+  6.5  VPOKE
+  6.6  VPEEK
+  6.7  FillVRAM
+  6.8  CopyToVRAM
+  6.9  CopyFromVRAM
+  6.10 SetVDP                       
+
+
+--------------------------------------------------------------------------------
+1 Introduction:
+
+Open Source library with basic functions to work with the TMS9918A/28A/29A video 
+processor.
+
+It does not use the MSX BIOS, so it is suitable for creating applications for 
+MSXDOS.
+
+Use them for developing MSX applications using Small Device C Compiler (SDCC).
+
+This package includes an application for test and learning purposes.
+                           
+
+
+--------------------------------------------------------------------------------
+2 Acknowledgments
+  
+  Thanks for Info & help, to:
+
+  Avelino Herrera > http://msx.atlantes.org/index_es.html
+  Nerlaska > http://albertodehoyonebot.blogspot.com.es
+  Fubu > http://www.gamerachan.org/fubu/
+  Marq/Lieves!Tuore > http://www.kameli.net/lt/
+  Sapphire/Z80ST > http://z80st.auic.es/
+  Pentacour > http://pentacour.com/
+  JamQue/TPM > http://www.thepetsmode.com/
+  Andrear > http://andrear.altervista.org/home/msxsoftware.php
+  Konamiman > https://www.konamiman.com
+  MSX Assembly Page > http://map.grauw.nl/resources/msxbios.php
+  Portar MSX Tech Doc > http://nocash.emubase.de/portar.htm
+  MSX Resource Center > http://www.msx.org/
+  Karoshi MSX Community > http://karoshi.auic.es/
+  BlueMSX >> http://www.bluemsx.com/
+  OpenMSX >> http://openmsx.sourceforge.net/
+  Meisei  >> ?
+
+
+
+--------------------------------------------------------------------------------
+3 Requirements:
+
+ * Small Device C Compiler (SDCC) v3.6 
+   http://sdcc.sourceforge.net/
+     
+ * Hex2bin v2.2 
+   http://hex2bin.sourceforge.net/
+   
+   
+
+--------------------------------------------------------------------------------
+4 Notes about operation
+
+It is important to know that the SCREEN function does not behave exactly like 
+the functions of the BIOS with the same purpose (CHGMOD, INITXT, INIGRP, etc.).
+SCREEN does not clean the entire VRAM and does not set the patterns from the MSX 
+font in text modes. This function changes to the indicated screen mode, writes 
+to the registers of the VDP the same configuration of the different tables used 
+in the MSX and fill the Name Table and the Sprite Attribute Table with de 0 
+value.
+
+It is also necessary to know that in the case of graphic mode 2 (screen 2), the 
+table of names will not be initialized, with consecutive values (normally used 
+to display a graphic without the use of repeated tiles).
+
+Due to the fact that the VDP registers can not be consulted, the writing of the 
+values of these has been included in the system variables used by the MSX. In 
+the case of wanting to adapt this library to another computer, they would have 
+to be deleted or placed in the memory area that is available.
+
+The COLOR function incorporates the value for the ink but does not produce any 
+effect, since this value is used by the BIOS to initialize the color table in 
+the screen start routines. This function writes the value for background and 
+border of the screen in register 7 of the VDP. In screen 0, the background color 
+changes the color of the ink and the color of the border changes the background.
+
+
+
+--------------------------------------------------------------------------------
+5 Constants
+
+
+5.1 Screen modes 1
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ TXT40   0x00    text mode       (screen 0)
+ TXT32   0x01    graphics 1 mode (screen 1)
+ GRAPH1  0x02    graphics 2 mode (screen 2)
+ GRAPH2  0x03    multicolor mode (screen 3)
+
+
+5.2 Screen modes 2
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ T1      0x00    text mode       (screen 0)
+ G1      0x01    graphics 1 mode (screen 1)
+ G2      0x02    graphics 2 mode (screen 2)
+ MC      0x03    multicolor mode (screen 3)
+
+
+5.3 Palette color codes
+
+ Label        Value 
+------------- ------
+ TRANSPARENT   0
+ BLACK         1
+ GREEN         2
+ LIGHT_GREEN   3
+ DARK_BLUE     4
+ LIGHT_BLUE    5
+ DARK_RED      6
+ CYAN          7
+ RED           8
+ LIGHT_RED     9
+ DARK_YELLOW  10
+ LIGHT_YELLOW 11
+ DARK_GREEN   12
+ MAGENTA      13
+ GRAY         14
+ GREY         14
+ WHITE        15
+
+
+5.4 VRAM address tables T1 (screen 0)
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ BASE0   0x0000  name table
+ BASE2   0x0800  character pattern table
+
+
+5.5 VRAM address tables G1 (screen 1)
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ BASE5   0x1800  name table
+ BASE6   0x2000  color table
+ BASE7   0x0000  character pattern table
+ BASE8   0x1B00  sprite attribute table OAM
+ BASE9   0x3800  sprite pattern table
+
+
+5.6 VRAM address tables G2 (screen 2)
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ BASE10  0x1800  name table
+ BASE11  0x2000  color table
+ BASE12  0x0000  character pattern table
+ BASE13  0x1B00  sprite attribute table OAM
+ BASE14  0x3800  sprite pattern table
+
+
+5.7 VRAM address tables MC (screen 3)
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ BASE15  0x0800  name table
+ BASE17  0x0000  character pattern table
+ BASE18  0x1B00  sprite attribute table OAM
+ BASE19  0x3800  sprite pattern table
+
+
+5.8 G2 BANKs addends:
+
+ Label   Value   Description
+-------- ------- ---------------------------------------------------------------
+ BANK0   0x0000
+ BANK1   0x0800
+ BANK2   0x1000
+
+
+
+
+
+--------------------------------------------------------------------------------
+6 Functions
+
+
+================================================================================
+6.1 SCREEN
+
+ Function : 
+            void SCREEN(char mode)
+            
+ Description:
+            Sets the display mode of the screen.
+            
+ Input    : 
+            [char] number of screen mode
+                             
+ Output   :
+            - 
+                            
+ Examples : 
+            SCREEN(2);
+  
+            SCREEN(GRAPH1);
+            
+
+
+
+================================================================================
+6.2 SetSpritesSize
+
+ Function : 
+            void SetSpritesSize(char size)
+            
+ Description:
+            Set size type for the sprites.
+            
+ Input    : 
+            [char] size: 0=8x8; 1=16x16
+                             
+ Output   :
+            - 
+                            
+ Examples :
+            SetSpritesSize(1);
+ 
+
+
+
+
+================================================================================
+6.3 SetSpritesZoom
+
+ Function : 
+            void SetSpritesZoom(char zoom)
+            
+ Description:
+            Set zoom type for the sprites.
+            
+ Input    : 
+            [char] zoom: 0 = x1; 1 = x2
+                             
+ Output   :
+            - 
+                            
+ Examples :
+            SetSpritesZoom(0);
+            
+ 
+ 
+================================================================================
+6.4 COLOR
+
+ Function : 
+            void COLOR(char ink, char BG, char border)
+            
+ Description:
+            Put the background and foreground colors.
+            
+ Input    : 
+            [char] ink color     <<<< Not used. BIOS version only.
+            [char] background color
+            [char] border color
+                             
+ Output   :
+            -
+                             
+ Examples :
+            COLOR(0, 4, 4);
+              
+            COLOR(0, DARK_BLUE, BLACK);
+
+
+
+================================================================================
+6.5 VPOKE
+
+ Function : 
+            void VPOKE(unsigned int VRAMaddr, char value)
+            
+ Description:
+            Writes a byte to the video RAM.
+            
+ Input    : 
+            [unsigned int] VRAM address
+            [char] value                 
+ Output   :
+            -
+                             
+ Examples :
+            VPOKE(0x1000, 255);
+
+            VPOKE(BASE10+100, 0x20);
+
+
+
+================================================================================
+6.6 VPEEK
+
+ Function : 
+            char VPEEK(unsigned int VRAMaddr)
+            
+ Description:
+            Reads data from the video RAM.
+            
+ Input    : 
+            [unsigned int] VRAM address
+                             
+ Output   :
+            [char] value
+                             
+ Examples :
+            value = VPEEK(0x1000);
+       
+            value = VPEEK(BASE10+48);
+ 
+
+
+================================================================================
+6.7 FillVRAM
+
+ Function : 
+            void FillVRAM(unsigned int VRAMaddr, unsigned int size, char value)
+            
+ Description:
+            Fill a large area of the VRAM of the same byte.
+            
+ Input    : 
+            [unsigned int] VRAM address
+            [unsigned int] block size
+            [char] Value to fill.
+                             
+ Output   :
+            -
+                             
+ Examples :
+            FillVRAM(BASE10,768,0x00);
+            
+            FillVRAM(BASE11+BANK1,1024,32);
+ 
+
+
+================================================================================
+6.8 CopyToVRAM
+
+ Function : 
+            void CopyToVRAM(unsigned int RAMaddr, unsigned int VRAMaddr, unsigned int size)
+            
+ Description:
+            Block transfer from memory to VRAM. 
+            
+ Input    : 
+            [unsigned int] RAM address
+            [unsigned int] VRAM address
+            [unsigned int] block size
+                             
+ Output   :
+            -
+                             
+ Examples :
+            CopyToVRAM(0xE000,BASE12,1024);
+ 
+ 
+
+================================================================================
+6.9 CopyFromVRAM
+
+ Function : 
+            void CopyFromVRAM(unsigned int VRAMaddr, unsigned int RAMaddr, unsigned int size)
+            
+ Description:
+            Block transfer from VRAM to memory.
+            
+ Input    : 
+            [unsigned int] VRAM address
+            [unsigned int] RAM address
+            [unsigned int] block size
+                             
+ Output   :
+            -
+                             
+ Examples :
+            CopyFromVRAM(BASE12,0xE000, 1024);
+ 
+
+
+================================================================================
+6.10 SetVDP
+
+ Function : 
+            void SetVDP(char register, char value)
+            
+ Description:
+            Writes a value in VDP registers.
+            
+ Input    : 
+            [char] VDP register
+            [char] value
+                             
+ Output   :
+            -
+                             
+ Examples :
+            SetVDP(1, 0b00000011);
+
+
+
+--------------------------------------------------------------------------------
+
+  
