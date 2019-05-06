@@ -1,6 +1,6 @@
 # SDCC MSX VDP TMS9918A Functions Library (object type)
 
-Version: 1.1 (25 April 2019)
+Version: 1.2 (4 May 2019)
 
 Author: mvac7/303bcn
 
@@ -19,7 +19,9 @@ mail: mvac7303b@gmail.com
 
 
 ### History of versions:
-- v1.0 (14/02/2014) Initial version
+- v1.2 ( 4 May 2019) << Current version >>
+- v1.1 (25 April 2019) 
+- v1.0 (14 February 2014) Initial version
 
 
 ## Introduction
@@ -99,6 +101,8 @@ Thanks for Info & help, to:
 * void SCREEN(char mode) - Sets the display mode of the screen.
 * void SetSpritesSize(char size) - Set size type for the sprites. (0=8x8; 1=16x16)
 * void SetSpritesZoom(char zoom) - Set zoom type for the sprites. (0=x1; 1=x2)
+* void CLS() - Clear Screen. Fill in 0, all Name Table.
+* void ClearSprites() - Initialises the sprite attribute table.
 * void COLOR(char ink, char BG, char border) - Put the background and foreground colors.
 * void VPOKE(unsigned int VRAMaddr, char value) - Writes a byte to the video RAM.
 * char VPEEK(unsigned int VRAMaddr) - Reads data from the video RAM.

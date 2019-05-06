@@ -1,6 +1,6 @@
 /* =============================================================================
   SDCC MSX VDP TMS9918A Functions Library (object type)
-  Version: 1.0
+  Version: 1.2
   Author: mvac7/303bcn
   Architecture: MSX
   Format: C Object (SDCC .rel)
@@ -11,9 +11,6 @@
   Description:
     Open Source library of functions to work with the TMS9918A/28A/29A video 
     processor 
-    
-  History of versions:
-    v1.0 (14/02/2014) current version
 ============================================================================= */
 #ifndef  __VDP_TMS9918A_H__
 #define  __VDP_TMS9918A_H__
@@ -126,6 +123,30 @@ extern void SetSpritesSize(char);
  Output:      -
 ============================================================================= */
 extern void SetSpritesZoom(char);
+
+
+
+/* =============================================================================
+ CLS 
+ Description: 
+             Clear Screen. Fill in 0, all Name Table.
+ Input:       -
+ Output:      -
+============================================================================= */
+extern void CLS();
+
+
+
+
+/* =============================================================================
+ ClearSprites
+ Description: 
+             Initialises the sprite attribute table. 
+             The vertical location of the sprite is set to 209.
+ Input:       -
+ Output:      -
+============================================================================= */
+extern void ClearSprites();
 
 
 

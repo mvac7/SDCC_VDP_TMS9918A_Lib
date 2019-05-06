@@ -1,5 +1,5 @@
 SDCC MSX VDP TMS9918A Functions Library (object type)
-Version: 1.1 (25 April 2019)
+Version: 1.2 (4 May 2019)
 Author: mvac7/303bcn
 Architecture: MSX
 Format: C Object (SDCC .rel)
@@ -12,10 +12,9 @@ Doc version: 1.0
 
 
 History of versions:
-- v1.0 (14/02/2014) Initial version
-
-Document changes:
-- v1.0 (13/04/2018) Initial version.
+- v1.2 ( 4 May 2019) << Current version >>
+- v1.1 (25 April 2019)
+- v1.0 (14 February 2014) Initial version
 
 
  
@@ -44,13 +43,15 @@ Index:
   6.1  SCREEN
   6.2  SetSpritesSize
   6.3  SetSpritesZoom
-  6.4  COLOR
-  6.5  VPOKE
-  6.6  VPEEK
-  6.7  FillVRAM
-  6.8  CopyToVRAM
-  6.9  CopyFromVRAM
-  6.10 SetVDP                       
+  6.4  CLS
+  6.5  ClearSprites
+  6.6  COLOR
+  6.7  VPOKE
+  6.8  VPEEK
+  6.9  FillVRAM
+  6.10 CopyToVRAM
+  6.11 CopyFromVRAM
+  6.12 SetVDP                       
 
 
 --------------------------------------------------------------------------------
@@ -246,8 +247,7 @@ changes the color of the ink and the color of the border changes the background.
  Input    : 
             [char] number of screen mode
                              
- Output   :
-            - 
+ Output   : - 
                             
  Examples : 
             SCREEN(2);
@@ -269,8 +269,7 @@ changes the color of the ink and the color of the border changes the background.
  Input    : 
             [char] size: 0=8x8; 1=16x16
                              
- Output   :
-            - 
+ Output   : - 
                             
  Examples :
             SetSpritesSize(1);
@@ -291,16 +290,53 @@ changes the color of the ink and the color of the border changes the background.
  Input    : 
             [char] zoom: 0 = x1; 1 = x2
                              
- Output   :
-            - 
+ Output   : - 
                             
  Examples :
             SetSpritesZoom(0);
             
  
+
+
+================================================================================
+6.4 CLS
+
+ Function : 
+            void CLS()
+            
+ Description:
+             Clear Screen. Fill in 0, all Name Table.
+            
+ Input    :  -
+                             
+ Output   :  -
+                             
+ Examples :
+            CLS();
+            
+
+
+
+================================================================================
+6.5 ClearSprites
+
+ Function : 
+            void ClearSprites()
+            
+ Description:
+             Initialises the sprite attribute table. 
+             The vertical location of the sprite is set to 209.
+            
+ Input    :  -
+                             
+ Output   :  -
+                             
+ Examples :
+            ClearSprites();
+
  
 ================================================================================
-6.4 COLOR
+6.6 COLOR
 
  Function : 
             void COLOR(char ink, char BG, char border)
@@ -313,8 +349,7 @@ changes the color of the ink and the color of the border changes the background.
             [char] background color
             [char] border color
                              
- Output   :
-            -
+ Output   : -
                              
  Examples :
             COLOR(0, 4, 4);
@@ -324,7 +359,7 @@ changes the color of the ink and the color of the border changes the background.
 
 
 ================================================================================
-6.5 VPOKE
+6.7 VPOKE
 
  Function : 
             void VPOKE(unsigned int VRAMaddr, char value)
@@ -334,9 +369,9 @@ changes the color of the ink and the color of the border changes the background.
             
  Input    : 
             [unsigned int] VRAM address
-            [char] value                 
- Output   :
-            -
+            [char] value
+                             
+ Output   : -
                              
  Examples :
             VPOKE(0x1000, 255);
@@ -346,7 +381,7 @@ changes the color of the ink and the color of the border changes the background.
 
 
 ================================================================================
-6.6 VPEEK
+6.8 VPEEK
 
  Function : 
             char VPEEK(unsigned int VRAMaddr)
@@ -368,7 +403,7 @@ changes the color of the ink and the color of the border changes the background.
 
 
 ================================================================================
-6.7 FillVRAM
+6.9 FillVRAM
 
  Function : 
             void FillVRAM(unsigned int VRAMaddr, unsigned int size, char value)
@@ -392,7 +427,7 @@ changes the color of the ink and the color of the border changes the background.
 
 
 ================================================================================
-6.8 CopyToVRAM
+6.10 CopyToVRAM
 
  Function : 
             void CopyToVRAM(unsigned int RAMaddr, unsigned int VRAMaddr, unsigned int size)
@@ -405,8 +440,7 @@ changes the color of the ink and the color of the border changes the background.
             [unsigned int] VRAM address
             [unsigned int] block size
                              
- Output   :
-            -
+ Output   : -
                              
  Examples :
             CopyToVRAM(0xE000,BASE12,1024);
@@ -414,7 +448,7 @@ changes the color of the ink and the color of the border changes the background.
  
 
 ================================================================================
-6.9 CopyFromVRAM
+6.11 CopyFromVRAM
 
  Function : 
             void CopyFromVRAM(unsigned int VRAMaddr, unsigned int RAMaddr, unsigned int size)
@@ -427,8 +461,7 @@ changes the color of the ink and the color of the border changes the background.
             [unsigned int] RAM address
             [unsigned int] block size
                              
- Output   :
-            -
+ Output   : -
                              
  Examples :
             CopyFromVRAM(BASE12,0xE000, 1024);
@@ -436,7 +469,7 @@ changes the color of the ink and the color of the border changes the background.
 
 
 ================================================================================
-6.10 SetVDP
+6.12 SetVDP
 
  Function : 
             void SetVDP(char register, char value)
@@ -448,8 +481,7 @@ changes the color of the ink and the color of the border changes the background.
             [char] VDP register
             [char] value
                              
- Output   :
-            -
+ Output   : -
                              
  Examples :
             SetVDP(1, 0b00000011);

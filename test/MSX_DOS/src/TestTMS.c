@@ -1,10 +1,9 @@
 /* =============================================================================
    Test VDP_TMS9918A 
-   v1.2 (26/04/2019)
+   v1.3 (4/May/2019)
    Description:
      test VDP TMS9918 Librarie (VDP_TMS9918_DOS)
      source for MSX-DOS
-   v1.1 (23/03/2017)
 ============================================================================= */
 
 #include "../include/newTypes.h"
@@ -39,8 +38,6 @@ void SCREEN1();
 char PEEK(uint address);
 void POKE(uint address, char value);
 
-void CLS();
-
 void VPRINT(char column, char line, char* text);  //print in screen 1 or 2
 void VPRINT0(char column, char line, char* text);
 void VPOKEARRAY(uint vaddr, char* text);
@@ -66,7 +63,7 @@ char isSPRITE16px();
 // constants  ------------------------------------------------------------------
 
 const char text01[] = "Test SDCC VDP_TMS9918A\n\r"; 
-const char text02[] = "v1.2 (26/04/2019)\n\r";
+const char text02[] = "v1.3 (4/May/2019)\n\r";
 const char text03[] = "Press any key to continue";
 
 
@@ -371,12 +368,6 @@ __endasm;
 
 
 
-void CLS()
-{
-  FillVRAM(BASE10, 0x300, 32);
-}
-
-
 //print in screen 1 or 2
 void VPRINT(char column, char line, char* text)
 {
@@ -500,6 +491,10 @@ void testSCREEN0()
     FillVRAM (BASE0+10, 942, i);    
   }
   
+  CLS();
+  VPRINT0(0,0,"CLS() in SCREEN 0");
+  WAIT(100);
+  
 }
 
 
@@ -537,7 +532,11 @@ void testSCREEN1()
   WAIT(50);
   
   testFill();
-  
+
+  CLS();
+  VPRINT(0,0,"CLS() in SCREEN 1");
+  WAIT(100);
+    
 }
 
 
@@ -589,6 +588,10 @@ void testSCREEN2()
   
   //test fill VRAM  
   testFill();
+
+  CLS();
+  VPRINT(0,0,"CLS() in SCREEN 2");
+  WAIT(100);
 
 }
 
@@ -697,7 +700,7 @@ void test_Sprites()
   FillVRAM (BASE10, 760, 0);
   VPRINT(0,0, "Test Sprites");  
   
-  CopyToVRAM((uint) SPRITE_DATA,BASE14,32*14);
+  CopyToVRAM((uint) SPRITE_DATA,BASE14,32*10);
   
   WAIT(50);
   
@@ -720,7 +723,11 @@ void test_Sprites()
   //setupSprites(1,true);
   VPRINT(0,4, "SetSpritesZoom(true) SPRITES x2");
   SetSpritesZoom(true);
-  //WAIT(100);
+  WAIT(100);
+  
+  VPRINT(0,5, "ClearSprites()");
+  ClearSprites();
+  WAIT(50);
 
 }
 

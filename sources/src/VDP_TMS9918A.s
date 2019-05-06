@@ -1,13 +1,14 @@
 ; ==============================================================================                                                                            
 ;   VDP_TMS9918A.s                                                          
-;   v1.1 (25 April 2019)                                                                     
+;   v1.2 (4 May 2019)                                                                     
 ;   Description:                                                              
 ;     * Opensource library for acces to VDP TMS9918A/28A/29A
 ;     * Not use the BIOS 
 ;     * using the ports 0x98 and 0x99 from MSX computers.
 ;     * save VDP values in MSX System variables
 ; History of versions:
-;   v1.0 (14 February 2014)                                                                           
+;   v1.0 (14 February 2014)
+;   v1.1 (25 April 2019)                                                                            
 ; ============================================================================== 
 	.area _DATA
 
@@ -56,6 +57,11 @@ BASE18 = 0x1B00 ; base 18 sprite attribute table
 BASE19 = 0x3800 ; base 19 sprite pattern table
 
 
+YHIDDEN = 0xD1  ; concealment of the sprite outside the limits of the screen in TMS9918A modes
+
+
+
+
 ;===============================================================================
 ; screen
 ; Sets the screen mode.
@@ -76,10 +82,7 @@ _SCREEN::
   jr   Z,screen3
   
 ;screen 0  
-  xor  A
-  ld   DE,#960   ;40*24
-  ld   HL,#BASE0
-  call fillVR
+  call ClearT1mode
   
   ld   IX,#mode_TXT1
   ;screen 0 > 40 columns mode
@@ -89,19 +92,19 @@ _SCREEN::
   jr  setREGs 
 
 screen1:
-  call ClearSC
-  call ClearOAM    
+  call ClearG1G2
+  call _ClearSprites    
   ld   IX,#mode_GFX1
   jr  setREGs
   
 screen3:
-  call ClearOAM  
+  call _ClearSprites  
   ld   IX,#mode_MC
   jr  setREGs  
 
 screen2:
-  call ClearSC
-  call ClearOAM      
+  call ClearG1G2
+  call _ClearSprites      
   ld   IX,#mode_GFX2
 
 setREGs:
@@ -135,22 +138,11 @@ setREGs:
   
   pop ix
   ret
-  
 
-ClearSC:
-  xor  A
-  ld   DE,#0x300    ;32*24
-  ld   HL,#BASE5
-  call fillVR
-  ret
-  
-ClearOAM:
-  xor  A
-  ld   DE,#0x80    ;32*4
-  ld   HL,#BASE8
-  call fillVR
-  ret  
-  
+
+
+; ==============================================================================
+; Screens data  
   
 ;Reg/Bit  7     6     5     4     3     2     1     0
 ;0        -     -     -     -     -     -     M3    EXTVID
@@ -195,6 +187,91 @@ mode_MC:
  .db 0x00  ;reg4 --
  .db 0x36  ;reg5 Sprite Attribute Table (1B00h)
  .db 0x07  ;reg6 Sprite Pattern Table   (3800h)  
+; ==============================================================================
+
+
+
+
+
+
+
+  
+
+
+; ==============================================================================
+; Clear Screen
+;
+_CLS::
+  ld   A,(#RG0SAV+1)
+  bit  4,A        ;M1=1
+  jr   NZ,ClearT1mode
+
+ClearG1G2:
+  xor  A
+  ld   DE,#0x300  ;32*24
+  ld   HL,#BASE5
+  jp   fillVR
+  
+ClearT1mode:
+  xor  A  
+  ld   DE,#960    ;40*24
+  ld   HL,#BASE0
+  jp   fillVR
+; ==============================================================================
+
+
+
+
+
+
+
+
+
+; ==============================================================================
+; ClearSprites
+; Description: 
+;             Initialises the sprite attribute table. 
+;             The vertical location of the sprite is set to 209.
+; Input:       -
+; Output:      -
+; ==============================================================================
+; void ClearSprites()
+_ClearSprites::
+
+  ld   HL,#BASE8
+  call SetVRAMaddr2WRITE 
+
+  ld   B,#32
+loop_ClearOAM:
+  ld   A,#YHIDDEN    ;(8ts) 
+  nop                ;(5ts)
+  nop                ;(5ts)
+  out  (VDPVRAM),A   ;(12ts) (time for write 29 T-states)  (attr Y)
+  xor  A             ;(8ts)
+  nop                ;(5ts)
+  nop                ;(5ts)
+  out  (VDPVRAM),A   ; (attr X)
+  xor  A             ;add a xorA because it favors in the calculation of the necessary waiting time between outs 
+  nop
+  nop
+  out  (VDPVRAM),A   ; (attr pattern number) in the BIOS increase the value (* 4 in 16x16 sprites) 
+  xor  A
+  nop
+  nop
+  out  (VDPVRAM),A   ; (attr color)
+  djnz loop_ClearOAM
+ 
+  
+;  xor  A
+;  ld   DE,#0x80    ;32*4
+;  ld   HL,#BASE8
+;  call fillVR
+
+  ret  
+; ==============================================================================
+
+
+
   
 
   
@@ -218,6 +295,7 @@ _SetSpritesSize::
   ld   A,4(ix)    
   cp   #1
   jr   NZ,size8
+  
   set  1,B ; 16x16
   jr   setSize
   
@@ -607,7 +685,7 @@ fillVR::
   call SetVRAMaddr2WRITE  
       
 VFILL_loop:
-  out  (C),B    ;(14ts)  14+7+5+5+13=44ts  (time for write 29 T-states)
+  out  (C),B          ;(14ts)  14+7+5+5+13=44ts  (time for write 29 T-states)
   
   dec  DE             ;(7ts)
   ld   A,D            ;(5ts)
