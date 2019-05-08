@@ -1,4 +1,4 @@
-SDCC MSX VDP TMS9918A Functions Library (object type)
+VDP TMS9918A Functions Library (object type)
 Version: 1.2 (4 May 2019)
 Author: mvac7/303bcn
 Architecture: MSX
@@ -18,8 +18,6 @@ History of versions:
 
 
  
->>> Warning!: Document pending correction. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
 
 --------------------------------------------------------------------------------
 Index:
@@ -61,7 +59,7 @@ Open Source library with basic functions to work with the TMS9918A/28A/29A video
 processor.
 
 It does not use the MSX BIOS, so it is suitable for creating applications for 
-MSXDOS.
+MSXDOS and ROM format.
 
 Use them for developing MSX applications using Small Device C Compiler (SDCC).
 

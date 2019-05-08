@@ -1,4 +1,4 @@
-# SDCC MSX VDP TMS9918A Functions Library (object type)
+# VDP TMS9918A Functions Library (object type)
 
 Version: 1.2 (4 May 2019)
 
