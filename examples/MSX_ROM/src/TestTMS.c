@@ -1,9 +1,13 @@
 /* =============================================================================
    Test VDP_TMS9918A_Lib 
-   v1.1 (4/05/2019)
+   v1.2 (23 July 2019)
+   
    Description:
      test VDP TMS9918 Librarie (VDP_TMS9918_DOS)
-     source for ROM 8k   
+     source for ROM 8k
+     
+   Histoy of versions:
+   - v1.1 (4 May 2019)   
 ============================================================================= */
 
 #include "../include/newTypes.h"
@@ -63,7 +67,7 @@ char isSPRITE16px();
 // constants  ------------------------------------------------------------------
 
 const char text01[] = "Test SDCC VDP_TMS9918A Lib\n\r"; 
-const char text02[] = "v1.1 (4/May/2019)\n\r";
+const char text02[] = "v1.2 (23/July/2019)\n\r";
 const char text03[] = "Press any key to continue";
 
 
@@ -465,7 +469,7 @@ void testColor()
 {
   char i;
 
-  COLOR(0,0,4);
+  COLOR(15,4,0);
   SCREEN(0);
     
   CopyToVRAM((uint) TILESET_SC0,BASE2,128*8);
@@ -475,7 +479,7 @@ void testColor()
   
   for(i=0;i<16;i++)
   { 
-    COLOR(0,i,15-i);
+    COLOR(i,15-i,0);
         
     WAIT(15);
   }  
@@ -490,7 +494,7 @@ void testSCREEN0()
 {
   byte i;
   
-  COLOR(0,DARK_GREEN,WHITE);    
+  COLOR(WHITE,DARK_GREEN,0);    
   SCREEN(0);
   
   CopyToVRAM((uint) TILESET_SC0,BASE2,128*8);
@@ -516,7 +520,9 @@ void testSCREEN0()
     FillVRAM (BASE0+10, 942, i);    
   }
   
+  WAIT(50);
   CLS();
+  WAIT(50);
   VPRINT0(0,0,"CLS() in SCREEN 0");
   WAIT(100);
   
@@ -558,7 +564,9 @@ void testSCREEN1()
   
   testFill();
   
+  WAIT(50);
   CLS();
+  WAIT(50);
   VPRINT(0,0,"CLS() in SCREEN 1");
   WAIT(100);
   
@@ -614,7 +622,9 @@ void testSCREEN2()
   //test fill VRAM  
   testFill();
   
+  WAIT(50);
   CLS();
+  WAIT(50);
   VPRINT(0,0,"CLS() in SCREEN 2");
   WAIT(100);
 
@@ -628,7 +638,7 @@ void testSCREEN3()
   char value=0;
   uint i;
   
-  COLOR(0,4,4);
+  COLOR(0,4,CYAN);
   SCREEN(1);
   
   FillVRAM(BASE6, 32, 0xE4);

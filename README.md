@@ -1,6 +1,6 @@
 # VDP TMS9918A Functions Library (object type)
 
-Version: 1.2 (4 May 2019)
+Version: 1.3 (23 July 2019)
 
 Author: mvac7/303bcn
 
@@ -19,7 +19,8 @@ mail: mvac7303b@gmail.com
 
 
 ### History of versions:
-- v1.2 ( 4 May 2019) << Current version >>
+- v1.3 (23 July  2019) COLOR function improvements
+- v1.2 ( 4 May   2019) 
 - v1.1 (25 April 2019) 
 - v1.0 (14 February 2014) Initial version
 
@@ -45,8 +46,8 @@ the functions of the BIOS with the same purpose (CHGMOD, INITXT, INIGRP, etc.).
 SCREEN does not clean the entire VRAM and does not set the patterns from the MSX 
 font in text modes. This function changes to the indicated screen mode, writes 
 to the registers of the VDP the same configuration of the different tables used 
-in the MSX and fill the Name Table and the Sprite Attribute Table with de 0 
-value.
+in the MSX and fill the Name Table and the Sprite attribute table with the value 
+0 and the Y position for hiding (209).
 
 It is also necessary to know that in the case of graphic mode 2 (screen 2), the 
 table of names will not be initialized, with consecutive values (normally used 
@@ -57,11 +58,10 @@ values of these has been included in the system variables used by the MSX. In
 the case of wanting to adapt this library to another computer, they would have 
 to be deleted or placed in the memory area that is available.
 
-The COLOR function incorporates the value for the ink but does not produce any 
-effect, since this value is used by the BIOS to initialize the color table in 
-the screen start routines. This function writes the value for background and 
-border of the screen in register 7 of the VDP. In screen 0, the background color 
-changes the color of the ink and the color of the border changes the background.
+The colors of ink and background of the COLOR function are only useful in text 
+mode, since the BIOS uses these values to initialize the color table in the 
+screen startup routines and this library does not. In all other modes it is 
+useful to adjust the border color of the screen.
 
 
 
@@ -103,7 +103,7 @@ Thanks for Info & help, to:
 * void SetSpritesZoom(char zoom) - Set zoom type for the sprites. (0=x1; 1=x2)
 * void CLS() - Clear Screen. Fill in 0, all Name Table.
 * void ClearSprites() - Initialises the sprite attribute table.
-* void COLOR(char ink, char BG, char border) - Put the background and foreground colors.
+* void COLOR(char ink, char BG, char border) - Put the ink, background and foreground colors.
 * void VPOKE(unsigned int VRAMaddr, char value) - Writes a byte to the video RAM.
 * char VPEEK(unsigned int VRAMaddr) - Reads data from the video RAM.
 * void FillVRAM(unsigned int VRAMaddr, unsigned int size, char value) - Fill a large area of the VRAM of the same byte.

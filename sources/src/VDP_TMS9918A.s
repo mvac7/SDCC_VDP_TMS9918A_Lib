@@ -1,6 +1,6 @@
 ; ==============================================================================                                                                            
 ;   VDP_TMS9918A.s                                                          
-;   v1.2 (4 May 2019)                                                                     
+;   v1.3 (23 July 2019)                                                                     
 ;   Description:                                                              
 ;     * Opensource library for acces to VDP TMS9918A/28A/29A
 ;     * Not use the BIOS 
@@ -8,7 +8,8 @@
 ;     * save VDP values in MSX System variables
 ; History of versions:
 ;   v1.0 (14 February 2014)
-;   v1.1 (25 April 2019)                                                                            
+;   v1.1 (25 April 2019)
+;   v1.2 (4 May 2019)                                                                             
 ; ============================================================================== 
 	.area _DATA
 
@@ -203,7 +204,7 @@ mode_MC:
 ;
 _CLS::
   ld   A,(#RG0SAV+1)
-  bit  4,A        ;M1=1
+  bit  4,A        ;M1=1   IF screen0?
   jr   NZ,ClearT1mode
 
 ClearG1G2:
@@ -250,15 +251,15 @@ loop_ClearOAM:
   xor  A             ;(8ts)
   nop                ;(5ts)
   nop                ;(5ts)
-  out  (VDPVRAM),A   ; (attr X)
+  out  (VDPVRAM),A   ;(attr X)
   xor  A             ;add a xorA because it favors in the calculation of the necessary waiting time between outs 
   nop
   nop
-  out  (VDPVRAM),A   ; (attr pattern number) in the BIOS increase the value (* 4 in 16x16 sprites) 
+  out  (VDPVRAM),A   ;(attr pattern number) in the BIOS increase the value (* 4 in 16x16 sprites) 
   xor  A
   nop
   nop
-  out  (VDPVRAM),A   ; (attr color)
+  out  (VDPVRAM),A   ;(attr color)
   djnz loop_ClearOAM
  
   
@@ -369,14 +370,30 @@ _COLOR::
   add  IX,SP
 
   ld   A,4(IX)
-  ld   (FORCLR),A ;save in system vars
+  ld   (#FORCLR),A ;save in system vars
   
-  ld   B,6(IX)
-  ld   (BDRCLR),A
+  ld   A,6(IX)
+  ld   (#BDRCLR),A
     
   ld   A,5(IX)
-  ld   (BAKCLR),A ;save in system vars
+  ld   (#BAKCLR),A ;save in system vars
 
+  ld   A,(#RG0SAV+1)
+  bit  4,A        ;M1=1   IF screen0?
+  jr   NZ,colorMode0
+  
+  ld   A,(#BDRCLR)
+  ld   B,A  
+  ld   A,(#BAKCLR)
+  jr   SAVEcolorREG
+
+colorMode0:
+  ld   A,(#BAKCLR)
+  ld   B,A 
+  ld   A,(#FORCLR)
+  
+
+SAVEcolorREG:
   sla  A
   sla  A
   sla  A
