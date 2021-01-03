@@ -19,9 +19,9 @@ Open Source library with basic functions to work with the TMS9918A/28A/29A video
 
 It does not use the MSX BIOS, so it can be used to develop ROM applications such as MSX-DOS.
 
-Use them for developing MSX applications using Small Device C Compiler (SDCC).
+Use them for developing MSX applications using [Small Device C Compiler (SDCC)](http://sdcc.sourceforge.net/) cross compiler.
 
-The source code includes an application to test or learn how to use the library.
+In the source code (\examples), you can find applications for testing and learning purposes.
 
 This library is part of the [MSX fR3eL Project](https://github.com/mvac7/SDCC_MSX_fR3eL).
 
