@@ -9,7 +9,7 @@ Programming language: C and Z80 assembler
 
 
 
-## Sorry! This text is pending correction of the English translation
+### Sorry! This text is pending correction of the English translation
 
 
 
@@ -17,7 +17,7 @@ Programming language: C and Z80 assembler
 
 Open Source library with basic functions to work with the TMS9918A/28A/29A video processor.
 
-It does not use the MSX BIOS, so it is suitable for creating applications for MSX-DOS. 
+It does not use the MSX BIOS, so it can be used to develop ROM applications such as MSX-DOS.
 
 Use them for developing MSX applications using Small Device C Compiler (SDCC).
 
@@ -96,11 +96,20 @@ in the MSX and fill the Name Table and the Sprite attribute table with the value
 It is also necessary to know that in the case of graphic mode 2 (screen 2), the table of names will not be initialized, 
 with consecutive values (normally used to display a graphic without the use of repeated tiles).
 
-Due to the fact that the VDP registers can not be consulted, 
-the writing of the values of these has been included in the system variables used by the MSX. 
-In the case of wanting to adapt this library to another computer, 
-they would have to be deleted or placed in the memory area that is available.
+Due to the fact that the VDP registers can not be consulted, the writing of the values of these has been included in the system variables used by the MSX. 
+In the case of wanting to adapt this library to another computer, they would have to be deleted or placed in the memory area that is available.
 
 The colors of ink and background of the COLOR function are only useful in text mode, 
 since the BIOS uses these values to initialize the color table in the screen startup routines and this library does not. 
 In all other modes it is useful to adjust the border color of the screen.
+
+
+
+## Documentation
+
+* Texas Instruments TMS9918A application manual [(PDF)](http://map.grauw.nl/resources/video/texasinstruments_tms9918.pdf)
+* Texas Instruments VDP Programmer’s Guide [(PDF)](http://map.grauw.nl/resources/video/ti-vdp-programmers-guide.pdf)
+* Texas Instruments TMS9918A VDP by Sean Young [(TXT)](http://bifi.msxnet.org/msxnet/tech/tms9918a.txt)
+* 9938 Technical Data Book [(PDF)](http://map.grauw.nl/resources/video/yamaha_v9938.pdf) [(TXT)](http://map.grauw.nl/resources/video/v9938/v9938.xhtml)
+* 9958 Technical Data Book [(PDF)](http://map.grauw.nl/resources/video/yamaha_v9958_ocr.pdf)
+* Portar Doc Video Display Processor [(WEB)](https://problemkaputt.de/portar.htm#videodisplayprocessor)

@@ -1,16 +1,5 @@
 /* =============================================================================
-  SDCC MSX VDP TMS9918A Functions Library (object type)
-  Version: 1.2
-  Author: mvac7/303bcn
-  Architecture: MSX
-  Format: C Object (SDCC .rel)
-  Programming language: C
-  WEB: -
-  mail: mvac7303b@gmail.com
-
-  Description:
-    Open Source library of functions to work with the TMS9918A/28A/29A video 
-    processor 
+  VDP TMS9918A MSX SDCC Library (fR3eL Project)
 ============================================================================= */
 #ifndef  __VDP_TMS9918A_H__
 #define  __VDP_TMS9918A_H__
