@@ -8,11 +8,6 @@ Programming language: C and Z80 assembler
 ```
 
 
-
-### Sorry! This text is pending correction of the English translation
-
-
-
 ## Description
 
 Open Source library with basic functions to work with the TMS9918A/28A/29A video processor.
@@ -30,11 +25,11 @@ Enjoy it!
 
 
 ## History of versions
-
-* v1.3 (23 July  2019) COLOR function improvements
-* v1.2 ( 4 May   2019) 
-* v1.1 (25 April 2019) 
-* v1.0 (14 February 2014) Initial version
+- v1.4 (16 August 2022) Bug#2 (init VRAM addr in V9938) and code optimization 
+- v1.3 (23 July  2019) COLOR function improvements
+- v1.2 ( 4 May   2019) 
+- v1.1 (25 April 2019) 
+- v1.0 (14 February 2014) Initial version
 
 
 
@@ -42,29 +37,6 @@ Enjoy it!
 
 * Small Device C Compiler (SDCC) v3.9 http://sdcc.sourceforge.net/
 * Hex2bin v2.5 http://hex2bin.sourceforge.net/ 
-
-
-
-## Acknowledgments
-  
-I want to give a special thanks to all those who freely share their knowledge with the MSX developer community.
-
-* Avelino Herrera > [WEB](http://msx.atlantes.org/index_es.html)
-* Nerlaska > [Blog](http://albertodehoyonebot.blogspot.com.es)
-* Marq/Lieves!Tuore > [Marq](http://www.kameli.net/marq/) [Lieves!Tuore](http://www.kameli.net/lt/)
-* [Fubukimaru](https://github.com/Fubukimaru) > [Blog](http://www.gamerachan.org/fubu/)
-* Andrear > [Blog](http://andrear.altervista.org/home/msxsoftware.php)
-* Ramones > [MSXblog](https://www.msxblog.es/tutoriales-de-programacion-en-ensamblador-ramones/) - [MSXbanzai](http://msxbanzai.tni.nl/dev/faq.html)
-* Sapphire/Z80ST > [WEB](http://z80st.auic.es/)
-* Fernando García > [youTube](https://www.youtube.com/user/bitvision)
-* Eric Boez > [gitHub](https://github.com/ericb59)
-* MSX Assembly Page > [WEB](http://map.grauw.nl/resources/msxbios.php)
-* Portar MSX Tech Doc > [WEB](http://nocash.emubase.de/portar.htm)
-* MSX Resource Center > [WEB](http://www.msx.org/)
-* Karoshi MSX Community (RIP 2007-2020)
-* BlueMSX emulator >> [WEB](http://www.bluemsx.com/)
-* OpenMSX emulator >> [WEB](http://openmsx.sourceforge.net/)
-* Meisei emulator >> ?
 
 
 

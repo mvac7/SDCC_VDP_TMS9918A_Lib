@@ -1,15 +1,18 @@
 ; ==============================================================================                                                                            
 ;   VDP_TMS9918A.s                                                          
-;   v1.3 (23 July 2019)                                                                     
+;   v1.4 (16 August 2022)
+;                                                                    
 ;   Description:                                                              
 ;     * Opensource library for acces to VDP TMS9918A/28A/29A
 ;     * Not use the BIOS 
 ;     * using the ports 0x98 and 0x99 from MSX computers.
 ;     * save VDP values in MSX System variables
 ; History of versions:
-;   v1.0 (14 February 2014)
-;   v1.1 (25 April 2019)
-;   v1.2 (4 May 2019)                                                                             
+; - v1.4 (16 August 2022) Bug#2 (init VRAM addr in V9938) and code optimization 
+; - v1.3 (23 July 2019) COLOR function improvements
+; - v1.2 (4 May 2019)
+; - v1.1 (25 April 2019) 
+; - v1.0 (14 February 2014)                                                                             
 ; ============================================================================== 
 	.area _DATA
 
@@ -23,7 +26,9 @@ VDPSTATUS = 0x99 ;VDP Status Registers
 
 
 ;system var
-MSXVER = 0x002D
+MSXID1 = 0x002B ;Basic ROM version 1/3
+MSXID2 = 0x002C ;Basic ROM version 2/3
+MSXID3 = 0x002D ;Basic ROM version 3/3 - MSX version number
 LINL40 = 0xF3AE ;Screen width per line in SCREEN 0
 RG0SAV = 0xF3DF ;#F3DF - #F3E6: vdp registers 0-7
 FORCLR = 0xF3E9 ;Foreground colour
@@ -85,7 +90,7 @@ _SCREEN::
 ;screen 0  
   call ClearT1mode
   
-  ld   IX,#mode_TXT1
+  ld   HL,#mode_TXT1
   ;screen 0 > 40 columns mode
   ld   A,#39  ;default value
   ld   (#LINL40),A 
@@ -95,48 +100,46 @@ _SCREEN::
 screen1:
   call ClearG1G2
   call _ClearSprites    
-  ld   IX,#mode_GFX1
+  ld   HL,#mode_GFX1
   jr  setREGs
   
 screen3:
   call _ClearSprites  
-  ld   IX,#mode_MC
+  ld   HL,#mode_MC
   jr  setREGs  
 
 screen2:
   call ClearG1G2
   call _ClearSprites      
-  ld   IX,#mode_GFX2
+  ld   HL,#mode_GFX2
+
 
 setREGs:
+  ld   B,#7
   ld   C,#0
-  ld   B,(IX)
+loopREGs:
+
+  ld   A,(HL)
   call writeVDP
-  
+  inc  HL
   inc  C
-  ld   B,1(IX)
-  call writeVDP
+  djnz  loopREGs
   
-  inc  C
-  ld   B,2(IX)
-  call writeVDP
+;initialize VRAM access on MSX2 or higher (V9938)
+  LD    HL,#MSXID3
+  LD    A,(#EXPTBL)            ;EXPTBL=main BIOS-ROM slot address
+  CALL  0x000C                 ;RDSLTReads the value of an address in another slot
+  EI
+  or   A   
+  jr   Z,EXIT_SCR
   
-  inc  C
-  ld   B,3(IX)
-  call writeVDP
+;clear upper bits (A14,A15,A16) from VRAM address for only acces to first 16k
+  xor  A
+  out  (VDPSTATUS),A   ;clear three upper bits for 16bit VRAM ADDR (128K)
+  ld   A,#14+128       ;V9938 reg 14 - Control Register
+  out  (VDPSTATUS),A
   
-  inc  C
-  ld   B,4(IX)
-  call writeVDP
-  
-  inc  C
-  ld   B,5(IX)
-  call writeVDP
-  
-  inc  C
-  ld   B,6(IX)
-  call writeVDP
-  
+EXIT_SCR: 
   pop ix
   ret
 
@@ -281,7 +284,7 @@ loop_ClearOAM:
 ; ==============================================================================
 ; SetSpritesSize
 ; Description: Set size type for the sprites.
-; Input:       [char] size: 0=8x8; 1=16x16
+; Input:       [char] size: 0-->8x8; other-->16x16
 ; Output:      -
 ;void SetSpritesSize(char size)
 ; ============================================================================== 
@@ -294,8 +297,8 @@ _SetSpritesSize::
   ld   B,(HL)
 
   ld   A,4(ix)    
-  cp   #1
-  jr   NZ,size8
+  or   A
+  jr   Z,size8
   
   set  1,B ; 16x16
   jr   setSize
@@ -305,6 +308,7 @@ size8:
 
 setSize:  
   ld   C,#0x01
+  ld   A,B
   call writeVDP
   
   pop  IX
@@ -331,6 +335,7 @@ _SetSpritesZoom::
   ld   A,4(ix)
   or   A
   jr   Z,nozoom
+  
   set  0,B ; zoom
   jr   setZoom
   
@@ -339,6 +344,7 @@ nozoom:
 
 setZoom:  
   ld   C,#0x01
+  ld   A,B
   call writeVDP
   
   pop  IX
@@ -401,7 +407,7 @@ SAVEcolorREG:
   add  A,B
   
   ld   C,#0x07 ;VDP reg 7
-  ld   B,A  
+;  ld   B,A  
   call writeVDP
    
   pop  IX
@@ -565,7 +571,7 @@ _SetVDP::
   add  IX,SP
       
   ld   C,4(IX) ;reg
-  ld   B,5(IX) ;value
+  ld   A,5(IX) ;value
   
   call writeVDP  
     
@@ -583,7 +589,7 @@ _SetVDP::
 ;===============================================================================
 ; writeVDP
 ; Function : write data in the VDP-register  
-; Input    : B  - data to write
+; Input    : A  - data to write
 ;            C  - number of the register
 ;===============================================================================
 writeVDP::
@@ -592,14 +598,14 @@ writeVDP::
   ld   E,C
   ld   D,#0
   add  IY,DE
-  ld   (IY),B ;save copy of vdp value in system var
+  ld   (IY),A ;save copy of vdp value in system var
   
-  ld   A,B
+;  ld   A,B
   di
-	out	 (#VDPSTATUS),A
-	ld   A,C
-  or   #0x80            ;add 128 to VDP reg value
-  out	 (#VDPSTATUS),A
+  out  (#VDPSTATUS),A
+  ld   A,C
+  or   #0x80            ;add 128 to VDP register number
+  out  (#VDPSTATUS),A
   ei
   ret
 
@@ -626,17 +632,8 @@ WriteByte2VRAM::
   ret
 
 
-SetVRAMaddr2WRITE:
+SetVRAMaddr2WRITE::
   di
-  ld   A,(#MSXVER) ;if MSX2?
-  or   A
-  jr   Z,WRITETMS      ;if MSX1(TMS9918A) goto WRITETMS
-;V9938 or higher
-  xor  A
-  out  (VDPSTATUS),A   ;clear three upper bits for 16bit VRAM ADDR (128K)
-  ld   A,#14+128       ;V9938 reg 14 - Control Register
-  out  (VDPSTATUS),A
-WRITETMS:
   ld   A,L             ;first 8bits from VRAM ADDR
   out  (VDPSTATUS),A
   ld   A,H             ;6 bits from VRAM ADDR 
@@ -666,16 +663,8 @@ ReadByteFromVRAM::
   ret
   
   
-SetVRAMaddr2READ:
+SetVRAMaddr2READ::
   di
-  ld A,(#MSXVER) ;if MSX2?
-  or A
-  jr Z,READTMS
-  xor A
-  out  (VDPSTATUS),A
-  ld   A,#0x8E
-  out  (VDPSTATUS),A
-READTMS:
   ld   A,L
   out  (VDPSTATUS),A
   ld   A,H
@@ -734,7 +723,7 @@ LDIR2VRAM::
   ld   C,#VDPVRAM
     
 VWRITE_loop:
-  outi         ;write [HL] to C port and INC HL
+  outi         ;out [c],[HL] + INC HL + dec B
   
   dec  DE
   ld   A,D
